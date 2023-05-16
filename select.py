@@ -9,7 +9,7 @@ from datetime import date, timedelta
 from pandas_datareader import data as pdr
 from concurrent.futures import ThreadPoolExecutor
 # override yfinance with pandas – seems to be a common step
-def lambda(resrc,shots,minhist)
+def selectLambda(resrc,shots,minhist):
 	yf.pdr_override()
 
 	# Get stock data from Yahoo Finance – here, asking for about 3 years
@@ -35,24 +35,23 @@ def lambda(resrc,shots,minhist)
 
 	for i in range(2, len(data)):
 
-	    body = 0.01
-
-	       # Three Soldiers
-	    if (data.Close[i] - data.Open[i]) >= body  \
-	and data.Close[i] > data.Close[i-1]  \
-	and (data.Close[i-1] - data.Open[i-1]) >= body  \
-	and data.Close[i-1] > data.Close[i-2]  \
-	and (data.Close[i-2] - data.Open[i-2]) >= body:
-		data.at[data.index[i], 'Buy'] = 1
+		body = 0.01
+		# Three Soldiers
+		if (data.Close[i] - data.Open[i]) >= body  \
+		and data.Close[i] > data.Close[i-1]  \
+		and (data.Close[i-1] - data.Open[i-1]) >= body  \
+		and data.Close[i-1] > data.Close[i-2]  \
+		and (data.Close[i-2] - data.Open[i-2]) >= body:
+			data.at[data.index[i], 'Buy'] = 1
 		#print("Buy at ", data.index[i])
 
-	       # Three Crows
-	    if (data.Open[i] - data.Close[i]) >= body  \
-	and data.Close[i] < data.Close[i-1] \
-	and (data.Open[i-1] - data.Close[i-1]) >= body  \
-	and data.Close[i-1] < data.Close[i-2]  \
-	and (data.Open[i-2] - data.Close[i-2]) >= body:
-		data.at[data.index[i], 'Sell'] = 1
+		# Three Crows
+		if (data.Open[i] - data.Close[i]) >= body  \
+		and data.Close[i] < data.Close[i-1] \
+		and (data.Open[i-1] - data.Close[i-1]) >= body  \
+		and data.Close[i-1] < data.Close[i-2]  \
+		and (data.Open[i-2] - data.Close[i-2]) >= body:
+			data.at[data.index[i], 'Sell'] = 1
 		#print("Sell at ", data.index[i])
 
 	# Data now contains signals, so we can pick signals with a minimum amount
@@ -67,21 +66,21 @@ def lambda(resrc,shots,minhist)
 			mean=data.Close[i-minhistory:i].pct_change(1).mean()
 			std=data.Close[i-minhistory:i].pct_change(1).std()
 			def getpage(id):
-			    try:
-			    	json={'key1': mean,'key2': std,'key3': shots}
-			    	#json= '{ "key1": "'+str(mean)+'","key2":"'+str(std)+'","key3":"'+str(shots)+'"}'
-			    	response=requests.post("https://ghxbycdfza.execute-api.us-east-1.amazonaws.com/default/testFunction",json=json)
-			    	data=response.json()
-			    	print(data)
-			    	return data
-			    except IOError:
-			    	print( 'Failed to open ', host ) # Is the Lambda address correct?
+				try:
+					json={'key1': mean,'key2': std,'key3': shots}
+					#json= '{ "key1": "'+str(mean)+'","key2":"'+str(std)+'","key3":"'+str(shots)+'"}'
+					response=requests.post("https://ghxbycdfza.execute-api.us-east-1.amazonaws.com/default/testFunction",json=json)
+					data=response.json()
+					print(data)
+					return data
+				except IOError:
+					print( 'Failed to open ', host ) # Is the Lambda address correct?
 			  
 
 			def getpages():
-			    with ThreadPoolExecutor() as executor:
-			    	results=executor.map(getpage, runs)
-			    return list(results)
+				with ThreadPoolExecutor() as executor:
+					results=executor.map(getpage, runs)
+				return list(results)
 			result=getpages()
 			
 			

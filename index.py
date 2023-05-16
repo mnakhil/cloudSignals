@@ -1,6 +1,5 @@
 import os
 import logging
-from select import labmda
 from flask import Flask, request, render_template
 
 app = Flask(__name__)
@@ -12,19 +11,13 @@ def doRender(tname, values={}):
 		return render_template('index.htm')
 	return render_template(tname, **values) 
 
-@web.route('/')
+@app.route('/')
 def hello():
-  return doRender("index.html")
+  return doRender("index.htm")
 	    	       
-@app.route('/calculate',methods=['POST'])
-def calculate():
-	if request.method=='POST':
-			    	       
-
-
+# @app.route('/calculate',methods=['POST'])
+# def calculate():
+# 	if request.method=='POST':
+			    	    
 if __name__ == '__main__':
-    # Entry point for running on the local machine
-    # On GAE, endpoints (e.g. /) would be called.
-    # Called as: gunicorn -b :$PORT index:app,
-    # host is localhost; port is 8080; this file is index (.py)
-    app.run(host='127.0.0.1', port=8080, debug=Tr
+	  app.run(host='127.0.0.1', port=8080, debug=True)
