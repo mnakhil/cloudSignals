@@ -59,20 +59,21 @@ def selectLambda(resrc,shots,minhist):
 	# to be generated based on the mean and standard deviation of the recent history
 	
 	runs=[value for value in range(resrc)]
-	0
 	resultsList=[]
 	for i in range(minhist, len(data)):
 		if data.Buy[i]==1: # if we’re interested in Buy signals
-			mean=data.Close[i-minhistory:i].pct_change(1).mean()
-			std=data.Close[i-minhistory:i].pct_change(1).std()
+			mean=data.Close[i-minhist:i].pct_change(1).mean()
+			std=data.Close[i-minhist:i].pct_change(1).std()
 			def getpage(id):
 				try:
 					json={'key1': mean,'key2': std,'key3': shots}
 					#json= '{ "key1": "'+str(mean)+'","key2":"'+str(std)+'","key3":"'+str(shots)+'"}'
 					response=requests.post("https://ghxbycdfza.execute-api.us-east-1.amazonaws.com/default/testFunction",json=json)
 					data=response.json()
-					print(data)
-					return data
+					var95=float(data['var95'])
+					var99=float(data['var99'])
+					print(var95,var99)
+					return [var95,var99]
 				except IOError:
 					print( 'Failed to open ', host ) # Is the Lambda address correct?
 			  
@@ -82,7 +83,7 @@ def selectLambda(resrc,shots,minhist):
 					results=executor.map(getpage, runs)
 				return list(results)
 			result=getpages()
-			
+	return result		
 			
 
 	    	       
