@@ -21,7 +21,12 @@ def calculate():
 		resrc=int(request.form.get('resrc'))
 		shots=int(request.form.get('shots'))
 		minhist=int(request.form.get('minhist'))
-		selectLambda(resrc,shots,minhist)
+		result=selectLambda(resrc,shots,minhist)
+		var95=[]
+		var99=[]
+		# for i in range(len(result)):
+		# 	tempResult=[i]
+			
 		return doRender("first.htm")
 	return doRender("calculate.htm")
 if __name__ == '__main__':

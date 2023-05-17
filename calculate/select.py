@@ -1,9 +1,11 @@
 import math
 import random
 import time
+import boto3
 import yfinance as yf
 import pandas as pd
 import requests
+import json
 import http.client
 from datetime import date, timedelta
 from pandas_datareader import data as pdr
@@ -20,7 +22,7 @@ def selectLambda(resrc,shots,minhist):
 	#time in 2021: https://en.wikipedia.org/wiki/GameStop_short_squeeze
 
 	data = pdr.get_data_yahoo('GME', start=decadeAgo, end=today)
-	data = pd.DataFrame.from_dict(data)
+	
 	# Other symbols: TSLA – Tesla, AMZN – Amazon, ZM – Zoom, ETH-USD – Ethereum-Dollar etc.
 
 	# Add two columns to this to allow for Buy and Sell signals
@@ -42,7 +44,7 @@ def selectLambda(resrc,shots,minhist):
 		and (data.Close[i-1] - data.Open[i-1]) >= body  \
 		and data.Close[i-1] > data.Close[i-2]  \
 		and (data.Close[i-2] - data.Open[i-2]) >= body:
-			data.at[data.index[i], 'Buy'] = 1
+				data.at[data.index[i], 'Buy'] = 1
 		#print("Buy at ", data.index[i])
 
 		# Three Crows
@@ -57,32 +59,45 @@ def selectLambda(resrc,shots,minhist):
 	# Data now contains signals, so we can pick signals with a minimum amount
 	# of historic data, and use shots for the amount of simulated values
 	# to be generated based on the mean and standard deviation of the recent history
-	
+	data = pd.DataFrame.from_dict(data)
 	runs=[value for value in range(resrc)]
 	resultsList=[]
-	for i in range(minhist, len(data)):
-		if data.Buy[i]==1: # if we’re interested in Buy signals
-			mean=data.Close[i-minhist:i].pct_change(1).mean()
-			std=data.Close[i-minhist:i].pct_change(1).std()
-			def getpage(id):
-				try:
-					json={'key1': mean,'key2': std,'key3': shots}
-					#json= '{ "key1": "'+str(mean)+'","key2":"'+str(std)+'","key3":"'+str(shots)+'"}'
-					response=requests.post("https://ghxbycdfza.execute-api.us-east-1.amazonaws.com/default/testFunction",json=json)
-					data=response.json()
-					var95=float(data['var95'])
-					var99=float(data['var99'])
-					print(var95,var99)
-					return [var95,var99]
-				except IOError:
-					print( 'Failed to open ', host ) # Is the Lambda address correct?
-			  
+	datap=data.to_dict(orient='records')
+	var95=None
+	var99=None
+	def getpage(id):
+		try:
+			payload = {
+					'data': datap,
+					'shots': shots,
+					'minhist': minhist,
+			}
+			json_payload = json.dumps(payload)
 
-			def getpages():
-				with ThreadPoolExecutor() as executor:
-					results=executor.map(getpage, runs)
-				return list(results)
-			result=getpages()
+			# Invoke the Lambda function
+			# lambda_client = boto3.client('https://ghxbycdfza.execute-api.us-east-1.amazonaws.com/default')
+
+			# response = lambda_client.invoke(
+			# 	FunctionName='testFunction',
+			# 	InvocationType='RequestResponse',
+			# 	Payload=json_payload
+			# )
+			response=requests.post("https://ghxbycdfza.execute-api.us-east-1.amazonaws.com/default/testFunction",json=json_payload)
+			data=response.json()
+			# var95=float(data['var95'])
+			# var99=float(data['var99'])
+			# print(var95,var99)
+			print(data)
+			return data
+		except IOError:
+			print( 'Failed to open ', host ) # Is the Lambda address correct?
+		
+
+	def getpages():
+		with ThreadPoolExecutor() as executor:
+			results=executor.map(getpage, runs)
+		return list(results)
+	result=getpages()
 	return result		
 			
 
