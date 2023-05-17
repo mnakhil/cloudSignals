@@ -22,6 +22,10 @@ def selectLambda(resrc,shots,minhist):
 	#time in 2021: https://en.wikipedia.org/wiki/GameStop_short_squeeze
 
 	data = pdr.get_data_yahoo('GME', start=decadeAgo, end=today)
+	data.reset_index(inplace=True)
+	data.rename(columns={'Date': 'Date'}, inplace=True)
+	data['Date'] = data['Date'].dt.strftime('%Y-%m-%d')
+	# data.reset_index(inplace=True)
 	
 	# Other symbols: TSLA – Tesla, AMZN – Amazon, ZM – Zoom, ETH-USD – Ethereum-Dollar etc.
 
@@ -59,12 +63,17 @@ def selectLambda(resrc,shots,minhist):
 	# Data now contains signals, so we can pick signals with a minimum amount
 	# of historic data, and use shots for the amount of simulated values
 	# to be generated based on the mean and standard deviation of the recent history
-	data = pd.DataFrame.from_dict(data)
+	
+	# data['date']=data.index
 	runs=[value for value in range(resrc)]
 	resultsList=[]
 	datap=data.to_dict(orient='records')
-	var95=None
-	var99=None
+
+	var95=[]
+	var99=[]
+	list95=[]
+	list99=[]
+	day=[]
 	def getpage(id):
 		try:
 			payload = {
@@ -73,7 +82,7 @@ def selectLambda(resrc,shots,minhist):
 					'minhist': minhist,
 			}
 			json_payload = json.dumps(payload)
-
+			# print(json_payload)
 			# Invoke the Lambda function
 			# lambda_client = boto3.client('https://ghxbycdfza.execute-api.us-east-1.amazonaws.com/default')
 
@@ -84,21 +93,40 @@ def selectLambda(resrc,shots,minhist):
 			# )
 			response=requests.post("https://ghxbycdfza.execute-api.us-east-1.amazonaws.com/default/testFunction",json=json_payload)
 			data=response.json()
-			# var95=float(data['var95'])
-			# var99=float(data['var99'])
-			# print(var95,var99)
 			print(data)
-			return data
+			
+			var95=json.loads(data['var95'])
+			var99=json.loads(data['var99'])
+			date=json.loads(data['date'])
+			# print(var95)
+			print(var95)
+			return [var95,var99,date]
 		except IOError:
 			print( 'Failed to open ', host ) # Is the Lambda address correct?
 		
-
+	
 	def getpages():
+		lvar95=[]
+		lvar99=[]
+		tempdate=[]
 		with ThreadPoolExecutor() as executor:
-			results=executor.map(getpage, runs)
-		return list(results)
+			result=executor.map(getpage, runs)
+			results=list(result)
+			for i in range(len(results)):
+				lvar95=lvar95+results[i][0]
+				lvar99=lvar99+results[i][1]
+				tempdate=tempdate+results[i][2]
+			# print(lvar95)
+		return [lvar95,lvar99,tempdate]
+		# return list(result)
+	
+
 	result=getpages()
-	return result		
+	resultsList.append(result)
+	# print(result)
+	# print(resultsList)
+	
+	return resultsList		
 			
 
 	    	       
