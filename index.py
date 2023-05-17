@@ -36,8 +36,9 @@ def calculate():
 		print(len(var95))
 		print(len(var99))
 		vardf=pd.DataFrame({'Day':day,'Var95':var95,'Var99':var99})	
-		html_df=vardf.to_html(header=True)
-		return doRender("first.htm",{'table':html_df})
+		# html_df=vardf.to_html(header=True)
+		return doRender("first.htm",{'dataframe':vardf})
+		# return render_template("first.htm",dataframe=vardf)
 	return doRender("calculate.htm")
 if __name__ == '__main__':
 	  app.run(host='127.0.0.1', port=8080, debug=True)

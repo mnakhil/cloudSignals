@@ -5,6 +5,25 @@
     <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Audit Page</a>
 </li>
 {% endblock %}
+
 {% block content %}
-{{table|safe}}
+<br><br><br>
+<table class="dataframe">
+    <thead>
+        <tr>
+            {% for col in dataframe.columns %}
+            <th>{{ col }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for _, row in dataframe.iterrows() %}
+        <tr>
+            {% for value in row %}
+            <td>{{ value }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

@@ -179,3 +179,18 @@ body{
   font-size: 24px;
   
 }
+.dataframe {
+  font-family: Arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.dataframe th,
+.dataframe td {
+  border: 1px solid #dddddd;
+  padding: 8px;
+}
+
+.dataframe th {
+  background-color: #f2f2f2;
+}
