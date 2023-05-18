@@ -1,7 +1,7 @@
 import math
 import random
 import time
-import boto3
+
 import yfinance as yf
 import pandas as pd
 import requests

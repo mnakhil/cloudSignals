@@ -3,8 +3,7 @@ import logging
 import pandas as pd
 from flask import Flask, request, render_template
 from calculate.select import selectLambda
-import gviz_api
-
+from gviz_api import DataTable
 app = Flask(__name__)
 
 # various Flask explanations available at:  https://flask.palletsprojects.com/en/1.1.x/quickstart/
@@ -46,7 +45,7 @@ def calculate():
 		
 		
 		vardf=pd.DataFrame({'Day':day,'Var95':var95,'Var99':var99,'Profit/Loss':prolos,'Margin':prloVal})
-		vardf['Day'] = pd.to_datetime(vardf['Day'])
+		#vardf['Day'] = pd.to_datetime(vardf['Day'])
 
 		# Convert 'Var95', 'Var99', and 'Margin' columns to float datatype
 		vardf['Var95'] = vardf['Var95'].astype(float)
@@ -55,9 +54,26 @@ def calculate():
 		# html_df=vardf.to_html(header=True)
 		average_var95 = vardf['Var95'].mean()
 		average_var99 = vardf['Var99'].mean()
-		average_marg = vardf['Margin'].mean()
+
+		# Create the line graph
+		plt.figure(figsize=(10, 6))
+		plt.plot(vardf['date'], vardf['Var95'], label='var95')
+		plt.plot(vardf['date'], vardf['Var99'], label='var99')
+		plt.axhline(y=average_var95, color='r', linestyle='--', label='Average var95')
+		plt.axhline(y=average_var99, color='b', linestyle='--', label='Average var99')
+		plt.title('Line Graph of var95 and var99')
+		plt.xlabel('Date')
+		plt.ylabel('Values')
+		plt.legend()
+
+		# # Save the chart to a folder
+		# folder_path = './charts'  # Specify the folder path relative to the current working directory
+		# file_name = 'line_graph.png'  # Specify the file name with the desired format (e.g., PNG, JPEG)
+		# save_path = f"{folder_path}/{file_name}"
+		plt.savefig("./charts/chart.png")
 		
-		return doRender("first.htm",{'dataframe':vardf})
+
+		return doRender("first.htm",{'dataframe':vardf,'dtable':dTable})
 		# return render_template("first.htm",dataframe=vardf)
 	return doRender("calculate.htm")
 if __name__ == '__main__':
