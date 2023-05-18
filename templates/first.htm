@@ -1,15 +1,5 @@
 {% extends "base.html" %}file:///home/comm034/Downloads/6672279_JosnaJosephCoursework/index.py
-{% block script %}
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script type="text/javascript">
-    google.charts.load('current', {'packages':['corechart']});
-    google.charts.setOnLoadCallback(drawChart);
 
-    function drawChart() {
-      var data = {{ dtable.to_json }}
-    }
-</script>
-{% endblock %}
 {% block nav %}
 <li class="nav-item">
     <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Audit Page</a>
@@ -18,9 +8,9 @@
 
 {% block content %}
 <br><br><br>
-<div id="chart_div" style="width: 100%; height: 400px;"></div>
+<img src="\static\chart.png">
 <br><br>
-<table class="dataframe">
+<table class="dataframe"> 
     <thead>
         <tr>
             {% for col in dataframe.columns %}

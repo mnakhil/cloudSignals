@@ -1,6 +1,7 @@
 import os
 import logging
 import pandas as pd
+import matplotlib.pyplot as plt
 from flask import Flask, request, render_template
 from calculate.select import selectLambda
 from gviz_api import DataTable
@@ -45,7 +46,7 @@ def calculate():
 		
 		
 		vardf=pd.DataFrame({'Day':day,'Var95':var95,'Var99':var99,'Profit/Loss':prolos,'Margin':prloVal})
-		#vardf['Day'] = pd.to_datetime(vardf['Day'])
+		# vardf['Day'] = pd.to_datetime(vardf['Day'])
 
 		# Convert 'Var95', 'Var99', and 'Margin' columns to float datatype
 		vardf['Var95'] = vardf['Var95'].astype(float)
@@ -54,11 +55,24 @@ def calculate():
 		# html_df=vardf.to_html(header=True)
 		average_var95 = vardf['Var95'].mean()
 		average_var99 = vardf['Var99'].mean()
+		mean_df = pd.DataFrame({
+			
+			'var95': [average_var95],
+			'var99': [average_var99]
+		})
 
+		# Concatenate the mean_df with the original df
+		df_concat = pd.concat([vardf, mean_df])
+
+		# Convert the 'date' column to datetime datatype
+		df_concat['Day'] = pd.to_datetime(df_concat['Day'])
+
+		# Sort the DataFrame by the 'date' column
+		df_sorted = df_concat.sort_values('Day')
 		# Create the line graph
 		plt.figure(figsize=(10, 6))
-		plt.plot(vardf['date'], vardf['Var95'], label='var95')
-		plt.plot(vardf['date'], vardf['Var99'], label='var99')
+		plt.plot(df_sorted['Day'], df_sorted['Var95'], label='var95')
+		plt.plot(df_sorted['Day'], df_sorted['Var99'], label='var99')
 		plt.axhline(y=average_var95, color='r', linestyle='--', label='Average var95')
 		plt.axhline(y=average_var99, color='b', linestyle='--', label='Average var99')
 		plt.title('Line Graph of var95 and var99')
@@ -70,10 +84,10 @@ def calculate():
 		# folder_path = './charts'  # Specify the folder path relative to the current working directory
 		# file_name = 'line_graph.png'  # Specify the file name with the desired format (e.g., PNG, JPEG)
 		# save_path = f"{folder_path}/{file_name}"
-		plt.savefig("./charts/chart.png")
+		plt.savefig("./static/chart.png")
 		
 
-		return doRender("first.htm",{'dataframe':vardf,'dtable':dTable})
+		return doRender("first.htm",{'dataframe':vardf})
 		# return render_template("first.htm",dataframe=vardf)
 	return doRender("calculate.htm")
 if __name__ == '__main__':

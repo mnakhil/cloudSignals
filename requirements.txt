@@ -4,3 +4,4 @@ pandas_datareader
 flask
 requests
 gviz_api
+matplotlib
