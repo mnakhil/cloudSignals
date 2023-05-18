@@ -22,20 +22,30 @@ def calculate():
 		resrc=int(request.form.get('resrc'))
 		shots=int(request.form.get('shots'))
 		minhist=int(request.form.get('minhist'))
-		results=selectLambda(resrc,shots,minhist)
+		pth=int(request.form.get('pth'))
+		results=selectLambda(resrc,shots,minhist,pth)
 		var95=[]
 		var99=[]
 		day=[]
-		print(results)
+		prolos=[]
+		prloVal=[]
+		# print(results)
 		for i in range(len(results)):
 			var95=var95+results[i][0]
 			var99=var99+results[i][1]
 			day=day+results[i][2]
-		
-		print(len(day))
-		print(len(var95))
-		print(len(var99))
-		vardf=pd.DataFrame({'Day':day,'Var95':var95,'Var99':var99})	
+			prolos=prolos+results[i][3]
+			prloVal=prloVal+results[i][4]
+		max_length=len(day)
+		print(len(prloVal))
+		prolos.extend(['Data not present'] * (max_length - len(prolos)))
+		prloVal.extend(['Nil'] * (max_length - len(prloVal)))
+		# print(len(prolos))
+		# print(len(prloVal))
+		# print(len(day))
+		# print(len(var95))
+		# print(len(var99))
+		vardf=pd.DataFrame({'Day':day,'Var95':var95,'Var99':var99,'Profit/Loss':prolos,'Margin':prloVal})	
 		# html_df=vardf.to_html(header=True)
 		return doRender("first.htm",{'dataframe':vardf})
 		# return render_template("first.htm",dataframe=vardf)
