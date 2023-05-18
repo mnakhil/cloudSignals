@@ -21,7 +21,7 @@ def selectLambda(resrc,shots,minhist,pth):
 	# Get stock data from Yahoo Finance – here, Gamestop which had an interesting
 	#time in 2021: https://en.wikipedia.org/wiki/GameStop_short_squeeze
 
-	data = pdr.get_data_yahoo('GME', start=decadeAgo, end=today)
+	data = pdr.get_data_yahoo('BP.L', start=decadeAgo, end=today)
 	
 	
 	# data.reset_index(inplace=True)
@@ -78,6 +78,8 @@ def selectLambda(resrc,shots,minhist,pth):
 	list99=[]
 	
 	day=[]
+	lastIndex=datal.index[len(datal)-1]
+	print(lastIndex)
 	global countv
 
 	def getpage(id):
@@ -109,8 +111,7 @@ def selectLambda(resrc,shots,minhist,pth):
 			date=json.loads(data['date'])
 			
 			
-			print(len(var95))
-			print(len(prolos))
+			
 			# print(var95)
 			# print(var95)
 			for i in range(minhist, len(datal)-pth):
@@ -152,7 +153,7 @@ def selectLambda(resrc,shots,minhist,pth):
 				temppl=temppl+results[i][3]
 				tempplv=tempplv+results[i][4]
 			# print(lvar95)
-			print(len(temppl))
+			
 		return [lvar95,lvar99,tempdate,temppl,tempplv]
 		# return list(result)
 	
