@@ -2,7 +2,7 @@ import os
 import logging
 import pandas as pd
 import matplotlib.pyplot as plt
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template,redirect
 from calculate.select import selectLambda
 from gviz_api import DataTable
 app = Flask(__name__)
@@ -14,14 +14,21 @@ def doRender(tname, values={}):
 		return render_template('index.htm')
 	return render_template(tname, **values) 
 
-@app.route('/')
+@app.route('/',methods=['GET','POST'])
 def home():
-  return doRender("index.htm")
-	    	       
-@app.route('/calculate',methods=['POST','GET'])
-def calculate():
 	if request.method=='POST':
-		resrc=int(request.form.get('resrc'))
+		resrc=int(request.form.get('resno'))
+		print(type(request.form.get('resno')))
+		restype=request.form.get('resType')
+		return redirect(f"/calculate/{resrc}/{restype}")
+	return doRender('index.htm')
+
+ 
+    	       
+@app.route('/calculate/<resrc>/<restype>',methods=['POST','GET'])
+def calculate(resrc,restype):
+	if request.method=='POST':
+		resrc=int(resrc)
 		shots=int(request.form.get('shots'))
 		minhist=int(request.form.get('minhist'))
 		pth=int(request.form.get('pth'))

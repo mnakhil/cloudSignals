@@ -187,10 +187,21 @@ body{
 
 .dataframe th,
 .dataframe td {
-  border: 1px solid #dddddd;
+  border: 1px solid #0a0a0a;
   padding: 8px;
 }
 
 .dataframe th {
-  background-color: #f2f2f2;
+  background-color: #3959e7;
+}
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+}
+
+.table-container {
+  margin-left: 250px;
+  margin-right: 250px;
 }

@@ -1,7 +1,44 @@
 {% extends "base.html" %}
 {% block content %}
 <br><br><br><br>
-  <h1>Welcome to the Risk Analysis App</h1>
+<h1 style="text-align: center;">Welcome to the Risk Analysis App</h1>
+<div class="login-form">
+  <img src="\static\heading002.png" class="rounded mx-auto d-block img-fluid" style="object-fit: cover"; width="642" height="153"> 
+  {% if error %}
+  {% if status==200 %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    {{error}}
+   <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
+   {% else %}
+   </div>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{error}} 
+    <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
+  </div>
+  {% endif %}
+  {% endif %}
+    <form method="POST">
+        <h2 class="text-center">Warm Up</h2>       
+        <div class="form-group">
+          
+          <select id="resType" name="resType" class="form-control" >
+            <option disabled selected value="">Select a resource type</option>
+            <option value="buy">Lambda</option>
+            <option value="sell">EC2</option>
+          </select>
+        </div>
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="No of resources" required="required" name="resno" >
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-block">WarmUP</button>
+        </div>
+             
+    </form>
+    
+    
+</div>
+ 
   <br><br>
-  <button><a href="/calculate">Calculate form</a></button>
+  
 {% endblock %}

@@ -2,15 +2,7 @@
 {% block content %}
 <br><br><br><br>
   <form method="POST">
-    <div class="form-group">
-      <label for="num-resources">Number of Resources:</label>
-      <input type="number" id="num-resources" name="resrc" required>
-    </div>
-
-    <div class="form-group">
-      <label for="resource-type">Resource Type:</label>
-      <input type="text" id="resource-type" name="resourceType" required>
-    </div>
+    
 
     <div class="form-group">
       <label for="num-shots">Number of Shots:</label>
@@ -23,8 +15,11 @@
     </div>
 
     <div class="form-group">
-      <label for="buys-signals">Buys Signals:</label>
-      <input type="text" id="buys-signals" name="signals" required>
+      <label for="transaction-type">Transaction Type:</label>
+      <select id="transaction-type" name="transaction-type" class="form-control">
+        <option value="buy">Buy</option>
+        <option value="sell">Sell</option>
+    </select>
     </div>
 
     <div class="form-group">

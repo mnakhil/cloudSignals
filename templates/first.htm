@@ -7,9 +7,12 @@
 {% endblock %}
 
 {% block content %}
-<br><br><br>
-<img src="\static\chart.png">
+<br><br><br><br>
+<div class="container">
+    <img src="\static\chart.png">
+</div>
 <br><br>
+<div class="table-container">
 <table class="dataframe"> 
     <thead>
         <tr>
@@ -28,4 +31,5 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
 {% endblock %}
