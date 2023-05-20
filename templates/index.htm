@@ -3,7 +3,7 @@
 <br><br><br><br>
 <h1 style="text-align: center;">Welcome to the Risk Analysis App</h1>
 <div class="login-form">
-  <img src="\static\heading002.png" class="rounded mx-auto d-block img-fluid" style="object-fit: cover"; width="642" height="153"> 
+  <img src="\static\heading002.png" class="rounded mx-auto d-block img-fluid" style="object-fit: cover"; > 
   {% if error %}
   {% if status==200 %}
   <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -23,8 +23,8 @@
           
           <select id="resType" name="resType" class="form-control" >
             <option disabled selected value="">Select a resource type</option>
-            <option value="buy">Lambda</option>
-            <option value="sell">EC2</option>
+            <option value="Lambda">Lambda</option>
+            <option value="EC2">EC2</option>
           </select>
         </div>
         <div class="form-group">

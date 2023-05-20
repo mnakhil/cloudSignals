@@ -1,17 +1,55 @@
 {% extends "base.html" %}
 {% block content %}
 <br><br><br><br>
+<div class="login-form">
+  <img src="\static\heading002.png" class="rounded mx-auto d-block img-fluid" style="object-fit: cover"; > 
+  {% if shots %}
+  
+  <form method="POST" action="/calculate/{{resrc}}/{{restype}}">
+    
+
+    <div class="form-group">
+      <label for="num-shots">Number of Shots:</label>
+      <input type="number" id="num-shots" name="shots" value="{{shots}}" class="form-control" required>
+    </div>
+
+    <div class="form-group">
+      <label for="history-days">History of Days:</label>
+      <input type="number" id="history-days" name="minhist" value="{{minhist}}" class="form-control" required>
+    </div>
+
+    <div class="form-group">
+      <label for="transaction-type">Transaction Type:</label>
+      <select id="transaction-type" name="transaction-type" class="form-control">
+        <option value="buy" {% if signal=="buy" %}selected{% endif %}>Buy</option>
+        <option value="sell" {% if signal=="sell" %}selected{% endif %}>Sell</option>
+    </select>
+    </div>
+
+    <div class="form-group">
+      <label for="profitability-time-horizon">Profitability Time Horizon:</label>
+      <input type="text" id="profitability-time-horizon" name="pth" value="{{pth}}" class="form-control" required>
+    </div>
+
+    <div class="form-group">
+      <input type="submit" value="Calculate" class="form-control">
+      
+    </div>
+  </form>
+
+  {% else %}
+ 
   <form method="POST">
     
 
     <div class="form-group">
       <label for="num-shots">Number of Shots:</label>
-      <input type="number" id="num-shots" name="shots" required>
+      <input type="number" id="num-shots" name="shots" class="form-control" required>
     </div>
 
     <div class="form-group">
       <label for="history-days">History of Days:</label>
-      <input type="number" id="history-days" name="minhist" required>
+      <input type="number" id="history-days" name="minhist" class="form-control" required>
     </div>
 
     <div class="form-group">
@@ -24,13 +62,15 @@
 
     <div class="form-group">
       <label for="profitability-time-horizon">Profitability Time Horizon:</label>
-      <input type="text" id="profitability-time-horizon" name="pth" required>
+      <input type="text" id="profitability-time-horizon" name="pth" class="form-control" required>
     </div>
 
     <div class="form-group">
-      <input type="submit" value="Submit">
-      <input type="reset" value="Reset">
+      <input type="submit" value="Calculate" class="form-control">
+      
     </div>
   </form>
+</div>
   <br><br>
+{% endif %}
 {% endblock %}

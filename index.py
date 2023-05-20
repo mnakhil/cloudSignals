@@ -8,7 +8,8 @@ from gviz_api import DataTable
 app = Flask(__name__)
 
 # various Flask explanations available at:  https://flask.palletsprojects.com/en/1.1.x/quickstart/
-
+global auditdf
+auditdf=pd.DataFrame()
 def doRender(tname, values={}):
 	if not os.path.isfile( os.path.join(os.getcwd(), 'templates/'+tname) ): #No such file
 		return render_template('index.htm')
@@ -20,10 +21,13 @@ def home():
 		resrc=int(request.form.get('resno'))
 		print(type(request.form.get('resno')))
 		restype=request.form.get('resType')
+		if restype=="Lambda":
+			selectLambda(resrc,100,50,10,"buy")
 		return redirect(f"/calculate/{resrc}/{restype}")
 	return doRender('index.htm')
 
- 
+global count
+count=0 
     	       
 @app.route('/calculate/<resrc>/<restype>',methods=['POST','GET'])
 def calculate(resrc,restype):
@@ -32,7 +36,8 @@ def calculate(resrc,restype):
 		shots=int(request.form.get('shots'))
 		minhist=int(request.form.get('minhist'))
 		pth=int(request.form.get('pth'))
-		results=selectLambda(resrc,shots,minhist,pth)
+		buysell=request.form.get('transaction-type')
+		results=selectLambda(resrc,shots,minhist,pth,buysell)
 		var95=[]
 		var99=[]
 		day=[]
@@ -58,7 +63,7 @@ def calculate(resrc,restype):
 		# Convert 'Var95', 'Var99', and 'Margin' columns to float datatype
 		vardf['Var95'] = vardf['Var95'].astype(float)
 		vardf['Var99'] = vardf['Var99'].astype(float)
-		vardf['Margin'] = vardf['Margin'].astype(float)	
+		# vardf['Margin'] = vardf['Margin'].astype(float)	
 		# html_df=vardf.to_html(header=True)
 		average_var95 = vardf['Var95'].mean()
 		average_var99 = vardf['Var99'].mean()
@@ -92,10 +97,27 @@ def calculate(resrc,restype):
 		# file_name = 'line_graph.png'  # Specify the file name with the desired format (e.g., PNG, JPEG)
 		# save_path = f"{folder_path}/{file_name}"
 		plt.savefig("./static/chart.png")
-		
-
+		global count
+		global auditdf
+		count+=1
+		audata={'SNo.':count,'No of resources':resrc,'Resource Type':restype,'Price History':minhist,'Shots':shots,'Buy/Sell':buysell,'PTH':pth}
+		auditdf=auditdf.append(audata,ignore_index=True)
 		return doRender("first.htm",{'dataframe':vardf})
 		# return render_template("first.htm",dataframe=vardf)
 	return doRender("calculate.htm")
+@app.route('/reset',methods=['GET','POST'])
+def reset():
+	global auditdf,count
+	print(auditdf)
+	shots=auditdf.at[count-1,'Shots']
+	minhist=auditdf.at[count-1,'Price History']
+	signal=auditdf.at[count-1,'Buy/Sell']
+	pth=auditdf.at[count-1,'PTH']
+	resrc=auditdf.at[count-1,'No of resources']
+	restype=auditdf.at[count-1,'Resource Type']
+	return doRender('calculate.htm',{'shots':shots,'minhist':minhist,'signal':signal,'pth':pth,'resrc':resrc,'restype':restype})
+@app.route('/audit',methods=['GET'])
+def audit():
+	return doRender('audit.html',{'dataframe':auditdf})
 if __name__ == '__main__':
 	  app.run(host='127.0.0.1', port=8080, debug=True)

@@ -11,7 +11,7 @@ from datetime import date, timedelta
 from pandas_datareader import data as pdr
 from concurrent.futures import ThreadPoolExecutor
 # override yfinance with pandas – seems to be a common step
-def selectLambda(resrc,shots,minhist,pth):
+def selectLambda(resrc,shots,minhist,pth,buysell):
 	yf.pdr_override()
 
 	# Get stock data from Yahoo Finance – here, asking for about 3 years
@@ -91,6 +91,7 @@ def selectLambda(resrc,shots,minhist,pth):
 					'data': datap,
 					'shots': shots,
 					'minhist': minhist,
+					'signal' : buysell
 			}
 			json_payload = json.dumps(payload)
 			# print(json_payload)
@@ -112,13 +113,16 @@ def selectLambda(resrc,shots,minhist,pth):
 			
 			
 			
-			# print(var95)
-			# print(var95)
+			print(len(var95))
+			print(len(var95))
+			print(len(date))
 			for i in range(minhist, len(datal)-pth):
-				if datal.Buy[i]==1:
+				if datal.Buy[i]==1 and buysell=='buy':
 					
 					datei=datal.index[i]
 					daysafter=datei+ pd.DateOffset(days=pth)
+					#some of the dates are not present in the dataset 
+					#so the while loop is used to find the next date present in the dataset
 					while daysafter not in datal.index:
 						daysafter+= pd.DateOffset(days=1)
 					firstVal=datal.loc[datei,'Close']
@@ -131,7 +135,26 @@ def selectLambda(resrc,shots,minhist,pth):
 						prolos.append('Loss')
 						pval=firstVal-checkVal
 						prloVal.append(pval)
-			
+				
+				if datal.Sell[i]==1 and buysell=='sell':
+					
+					datei=datal.index[i]
+					daysafter=datei+ pd.DateOffset(days=pth)
+					#some of the dates are not present in the dataset 
+					#so the while loop is used to find the next date present in the dataset
+					while daysafter not in datal.index:
+						daysafter+= pd.DateOffset(days=1)
+					firstVal=datal.loc[datei,'Close']
+					checkVal=datal.loc[daysafter,'Close']
+					if checkVal>firstVal:
+						prolos.append('Profit')
+						pval=checkVal-firstVal
+						prloVal.append(pval)
+					else:
+						prolos.append('Loss')
+						pval=firstVal-checkVal
+						prloVal.append(pval)
+			print(prloVal)
 			return [var95,var99,date,prolos,prloVal]
 		except IOError:
 			print( 'Failed to open ', host ) # Is the Lambda address correct?

@@ -156,7 +156,7 @@ form input[type="submit"]:hover {
 }
 .navbar {
   height: 80px;
-  background-color: rgb(64, 199, 240);
+  background-color:#5da4e7;
 }
 
 .navbar .nav-link {
@@ -169,7 +169,7 @@ form input[type="submit"]:hover {
   color: black;
 }
 body{
-  background-color: rgb(190, 229, 239);
+  background-color: #9FE4E4;
   min-height: 100vh;
   display: flex;
   flex-direction: column; 

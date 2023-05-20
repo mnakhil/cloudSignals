@@ -2,22 +2,18 @@
 
 {% block nav %}
 <li class="nav-item">
-    <a class="nav-link active" aria-current="page" href="{{ url_for('audit') }}">Audit Page</a>
-</li>
-<li class="nav-item">
-    <a class="nav-link active" aria-current="page" href="{{ url_for('reset') }}">Reset</a>
+    <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
 </li>
 <li class="nav-item">
     <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Terminate</a>
 </li>
+
 {% endblock %}
 
 {% block content %}
 <br><br><br><br>
-<div class="container">
-    <img src="\static\chart.png">
-</div>
-<br><br>
+
+
 <div class="table-container">
 <table class="dataframe"> 
     <thead>
