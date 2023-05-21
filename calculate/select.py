@@ -103,7 +103,8 @@ def selectLambda(resrc,shots,minhist,pth,buysell):
 			# 	InvocationType='RequestResponse',
 			# 	Payload=json_payload
 			# )
-			response=requests.post("https://ghxbycdfza.execute-api.us-east-1.amazonaws.com/default/testFunction",json=json_payload)
+			#response=requests.post("http://ghxbycdfza.execute-api.us-east-1.amazonaws.com/default/testFunction",json=json_payload)
+			response=requests.post("http://ec2-18-212-237-203.compute-1.amazonaws.com:5000/cloudapi",json=json_payload)
 			data=response.json()
 			# print(data)
 			
@@ -154,7 +155,7 @@ def selectLambda(resrc,shots,minhist,pth,buysell):
 						prolos.append('Loss')
 						pval=firstVal-checkVal
 						prloVal.append(pval)
-			print(prloVal)
+			
 			return [var95,var99,date,prolos,prloVal]
 		except IOError:
 			print( 'Failed to open ', host ) # Is the Lambda address correct?
