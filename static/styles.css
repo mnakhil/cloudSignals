@@ -55,7 +55,7 @@ li a {
 
 /* Change the link color to #111 (black) on hover */
 li a:hover {
-  color: hsl(0, 99%, 54%);
+  color: hsl(0, 7%, 54%);
 }
 
 
@@ -156,7 +156,8 @@ form input[type="submit"]:hover {
 }
 .navbar {
   height: 80px;
-  background-color:#5da4e7;
+  background-color: #119999;
+;
 }
 
 .navbar .nav-link {

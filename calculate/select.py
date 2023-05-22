@@ -11,7 +11,7 @@ from datetime import date, timedelta
 from pandas_datareader import data as pdr
 from concurrent.futures import ThreadPoolExecutor
 # override yfinance with pandas – seems to be a common step
-def selectLambda(resrc,shots,minhist,pth,buysell):
+def runInstance(resrc,shots,minhist,pth,buysell,restype):
 	yf.pdr_override()
 
 	# Get stock data from Yahoo Finance – here, asking for about 3 years
@@ -103,8 +103,10 @@ def selectLambda(resrc,shots,minhist,pth,buysell):
 			# 	InvocationType='RequestResponse',
 			# 	Payload=json_payload
 			# )
-			#response=requests.post("http://ghxbycdfza.execute-api.us-east-1.amazonaws.com/default/testFunction",json=json_payload)
-			response=requests.post("http://ec2-18-212-237-203.compute-1.amazonaws.com:5000/cloudapi",json=json_payload)
+			if restype=="Lambda":
+				response=requests.post("https://ghxbycdfza.execute-api.us-east-1.amazonaws.com/default/testFunction",json=json_payload)
+			else:
+				response=requests.post("http://ec2-18-212-84-251.compute-1.amazonaws.com:5000/cloudapi",json=json_payload)
 			data=response.json()
 			# print(data)
 			

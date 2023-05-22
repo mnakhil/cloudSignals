@@ -3,7 +3,7 @@ import logging
 import pandas as pd
 import matplotlib.pyplot as plt
 from flask import Flask, request, render_template,redirect
-from calculate.select import selectLambda
+from calculate.select import runInstance
 from gviz_api import DataTable
 app = Flask(__name__)
 
@@ -22,7 +22,7 @@ def home():
 		print(type(request.form.get('resno')))
 		restype=request.form.get('resType')
 		if restype=="Lambda":
-			selectLambda(resrc,100,50,10,"buy")
+			runInstance(resrc,100,50,10,"buy",restype)
 		return redirect(f"/calculate/{resrc}/{restype}")
 	return doRender('index.htm')
 
@@ -37,7 +37,7 @@ def calculate(resrc,restype):
 		minhist=int(request.form.get('minhist'))
 		pth=int(request.form.get('pth'))
 		buysell=request.form.get('transaction-type')
-		results=selectLambda(resrc,shots,minhist,pth,buysell)
+		results=runInstance(resrc,shots,minhist,pth,buysell,restype)
 		var95=[]
 		var99=[]
 		day=[]
