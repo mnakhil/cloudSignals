@@ -1,7 +1,7 @@
 import math
 import random
 import time
-
+from time import time
 import yfinance as yf
 import pandas as pd
 import requests
@@ -150,11 +150,11 @@ def runInstance(resrc,shots,minhist,pth,buysell,restype):
 					firstVal=datal.loc[datei,'Close']
 					checkVal=datal.loc[daysafter,'Close']
 					if checkVal>firstVal:
-						prolos.append('Profit')
+						prolos.append('Loss')
 						pval=checkVal-firstVal
 						prloVal.append(pval)
 					else:
-						prolos.append('Loss')
+						prolos.append('Profit')
 						pval=firstVal-checkVal
 						prloVal.append(pval)
 			

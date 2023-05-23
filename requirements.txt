@@ -5,3 +5,4 @@ flask
 requests
 gviz_api
 matplotlib
+pysqlite3

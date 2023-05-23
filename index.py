@@ -1,12 +1,18 @@
 import os
 import logging
 import pandas as pd
+import sqlite3
+from time import time
 import matplotlib.pyplot as plt
 from flask import Flask, request, render_template,redirect
 from calculate.select import runInstance
 from gviz_api import DataTable
 app = Flask(__name__)
-
+global conn,cursor
+conn=sqlite3.connect('db/audit.db')
+cursor=conn.cursor()
+cursor.execute('''CREATE TABLE IF NOT EXISTS audit(id INTEGER PRIMARY KEY AUTOINCREMENT,restype TEXT,resno INTEGER,minhistory INTEGER,shots INTEGER, pth INTEGER,buysell TEXT,exect FLOAT,avgprlo FLOAT)''')
+conn.close()
 # various Flask explanations available at:  https://flask.palletsprojects.com/en/1.1.x/quickstart/
 global auditdf
 auditdf=pd.DataFrame()
@@ -32,12 +38,16 @@ count=0
 @app.route('/calculate/<resrc>/<restype>',methods=['POST','GET'])
 def calculate(resrc,restype):
 	if request.method=='POST':
+		global conn,cursor
 		resrc=int(resrc)
 		shots=int(request.form.get('shots'))
 		minhist=int(request.form.get('minhist'))
 		pth=int(request.form.get('pth'))
 		buysell=request.form.get('transaction-type')
+		startT=time()
 		results=runInstance(resrc,shots,minhist,pth,buysell,restype)
+		endT=time()
+		execT=endT-startT
 		var95=[]
 		var99=[]
 		day=[]
@@ -91,17 +101,24 @@ def calculate(resrc,restype):
 		plt.xlabel('Date')
 		plt.ylabel('Values')
 		plt.legend()
-
+		
 		# # Save the chart to a folder
 		# folder_path = './charts'  # Specify the folder path relative to the current working directory
 		# file_name = 'line_graph.png'  # Specify the file name with the desired format (e.g., PNG, JPEG)
 		# save_path = f"{folder_path}/{file_name}"
 		plt.savefig("./static/chart.png")
-		global count
-		global auditdf
-		count+=1
-		audata={'SNo.':count,'No of resources':resrc,'Resource Type':restype,'Price History':minhist,'Shots':shots,'Buy/Sell':buysell,'PTH':pth}
-		auditdf=auditdf.append(audata,ignore_index=True)
+		
+		# global auditdf
+		newdf=vardf.copy()
+		newdf['Margin']=pd.to_numeric(newdf['Margin'],errors='coerce')
+		avgprlos=newdf['Margin'].mean()
+		# audata={'SNo.':count,'No of resources':resrc,'Resource Type':restype,'Price History':minhist,'Shots':shots,'Buy/Sell':buysell,'PTH':pth}
+		# auditdf=auditdf.append(audata,ignore_index=True)
+		conn=sqlite3.connect('db/audit.db')
+		cursor=conn.cursor()
+		cursor.execute("INSERT INTO audit (restype,resno,minhistory,shots,pth,buysell,exect,avgprlo) VALUES(?,?,?,?,?,?,?,?)",(restype,resrc,minhist,shots,pth,buysell,execT,avgprlos))
+		conn.commit()
+		conn.close()
 		return doRender("first.htm",{'dataframe':vardf})
 		# return render_template("first.htm",dataframe=vardf)
 	return doRender("calculate.htm")
@@ -118,6 +135,13 @@ def reset():
 	return doRender('calculate.htm',{'shots':shots,'minhist':minhist,'signal':signal,'pth':pth,'resrc':resrc,'restype':restype})
 @app.route('/audit',methods=['GET'])
 def audit():
+	conn=sqlite3.connect('db/audit.db')
+	cursor=conn.cursor()
+	cursor.execute("SELECT * FROM audit")
+	auditData=cursor.fetchall()
+	conn.close()
+	print(auditData)
+	auditdf=pd.DataFrame(auditData,columns=['SNo.','Resource Type','No of Resources','History','Shots','Probability','SignalType','ExecutionTime','Avergae Profit/Loss'])
 	return doRender('audit.html',{'dataframe':auditdf})
 if __name__ == '__main__':
 	  app.run(host='127.0.0.1', port=8080, debug=True)
