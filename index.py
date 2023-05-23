@@ -1,6 +1,7 @@
 import os
 import logging
 import pandas as pd
+import datetime
 import sqlite3
 from time import time
 import matplotlib.pyplot as plt
@@ -119,7 +120,9 @@ def calculate(resrc,restype):
 		cursor.execute("INSERT INTO audit (restype,resno,minhistory,shots,pth,buysell,exect,avgprlo) VALUES(?,?,?,?,?,?,?,?)",(restype,resrc,minhist,shots,pth,buysell,execT,avgprlos))
 		conn.commit()
 		conn.close()
-		return doRender("first.htm",{'dataframe':vardf})
+		dates = df_concat['Day'].to_list()
+		# return doRender("first.htm",{'dataframe':vardf})
+		return doRender("first.htm",{'dates':day,'var95':var95,'var99':var99,'average95':average_var95,'average99':average_var99,'dataframe':vardf})
 		# return render_template("first.htm",dataframe=vardf)
 	return doRender("calculate.htm")
 @app.route('/reset',methods=['GET','POST'])

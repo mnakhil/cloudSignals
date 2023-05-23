@@ -11,12 +11,48 @@
     <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Terminate</a>
 </li>
 {% endblock %}
+{% block script %}
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load('current', { 'packages': ['corechart'] });
+    google.charts.setOnLoadCallback(drawChart);
 
+    function drawChart() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('date', 'Date');
+        data.addColumn('number', 'Var95');
+        data.addColumn('number', 'Var99');
+        data.addColumn('number', 'Average95');
+        data.addColumn('number', 'Average99');
+
+        var dates = {{ dates | tojson }};
+        var var95 = {{ var95 | tojson }};
+        var var99 = {{ var99 | tojson }};
+        var average95 = {{ average95 }};
+        var average99 = {{ average99 }};
+        for (var i = 0; i < dates.length; i++) {
+            var dateParts = dates[i].split('-');
+            var date = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+            data.addRow([date, var95[i], var99[i], average95, average99]);
+        }
+        data.sort([{ column: 0 }]);
+        var options = {
+            title: 'Chart comparing the Risk values:',
+            curveType: 'function',
+            legend: { position: 'bottom' },
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+    }
+</script>
+
+{% endblock %}
 {% block content %}
-<br><br><br><br>
-<div class="container">
-    <img src="\static\chart.png">
-</div>
+<br><br><br><br><br>
+
+    <div id="chart_div" class="container"></div>
+
 <br><br>
 <div class="table-container">
 <table class="dataframe"> 

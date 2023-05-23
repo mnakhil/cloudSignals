@@ -174,6 +174,7 @@ body{
   min-height: 100vh;
   display: flex;
   flex-direction: column; 
+  
 }
 #p1{
   text-align: justify;
@@ -200,6 +201,12 @@ body{
   justify-content: center;
   align-items: center;
   
+}
+#chart_div {
+  
+  width: 1200px; 
+  height: 600px;
+ 
 }
 
 .table-container {
