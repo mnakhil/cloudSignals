@@ -2,18 +2,16 @@ import os
 import logging
 import pandas as pd
 import datetime
-import sqlite3
 from time import time
 import matplotlib.pyplot as plt
 from flask import Flask, request, render_template,redirect
 from calculate.select import runInstance
 from gviz_api import DataTable
 app = Flask(__name__)
-global conn,cursor
-conn=sqlite3.connect('db/audit.db')
-cursor=conn.cursor()
-cursor.execute('''CREATE TABLE IF NOT EXISTS audit(id INTEGER PRIMARY KEY AUTOINCREMENT,restype TEXT,resno INTEGER,minhistory INTEGER,shots INTEGER, pth INTEGER,buysell TEXT,exect FLOAT,avgprlo FLOAT)''')
-conn.close()
+
+
+
+
 # various Flask explanations available at:  https://flask.palletsprojects.com/en/1.1.x/quickstart/
 global auditdf
 auditdf=pd.DataFrame()
@@ -89,41 +87,19 @@ def calculate(resrc,restype):
 
 		# Convert the 'date' column to datetime datatype
 		df_concat['Day'] = pd.to_datetime(df_concat['Day'])
-
-		# Sort the DataFrame by the 'date' column
-		df_sorted = df_concat.sort_values('Day')
-		# Create the line graph
-		plt.figure(figsize=(10, 6))
-		plt.plot(df_sorted['Day'], df_sorted['Var95'], label='var95')
-		plt.plot(df_sorted['Day'], df_sorted['Var99'], label='var99')
-		plt.axhline(y=average_var95, color='r', linestyle='--', label='Average var95')
-		plt.axhline(y=average_var99, color='b', linestyle='--', label='Average var99')
-		plt.title('Line Graph of var95 and var99')
-		plt.xlabel('Date')
-		plt.ylabel('Values')
-		plt.legend()
-		
-		# # Save the chart to a folder
-		# folder_path = './charts'  # Specify the folder path relative to the current working directory
-		# file_name = 'line_graph.png'  # Specify the file name with the desired format (e.g., PNG, JPEG)
-		# save_path = f"{folder_path}/{file_name}"
-		plt.savefig("./static/chart.png")
-		
-		# global auditdf
+		global count
+		count+=1
+		global auditdf
 		newdf=vardf.copy()
 		newdf['Margin']=pd.to_numeric(newdf['Margin'],errors='coerce')
 		avgprlos=newdf['Margin'].mean()
-		# audata={'SNo.':count,'No of resources':resrc,'Resource Type':restype,'Price History':minhist,'Shots':shots,'Buy/Sell':buysell,'PTH':pth}
-		# auditdf=auditdf.append(audata,ignore_index=True)
-		conn=sqlite3.connect('db/audit.db')
-		cursor=conn.cursor()
-		cursor.execute("INSERT INTO audit (restype,resno,minhistory,shots,pth,buysell,exect,avgprlo) VALUES(?,?,?,?,?,?,?,?)",(restype,resrc,minhist,shots,pth,buysell,execT,avgprlos))
-		conn.commit()
-		conn.close()
+		audata={'SNo.':count,'No of resources':resrc,'Resource Type':restype,'Price History':minhist,'Shots':shots,'Buy/Sell':buysell,'PTH':pth,'Execution Time':execT,'Profit/Loss Avg':avgprlos}
+		auditdf=auditdf.append(audata,ignore_index=True)
 		dates = df_concat['Day'].to_list()
 		# return doRender("first.htm",{'dataframe':vardf})
 		return doRender("first.htm",{'dates':day,'var95':var95,'var99':var99,'average95':average_var95,'average99':average_var99,'dataframe':vardf})
-		# return render_template("first.htm",dataframe=vardf)
+		
+	
 	return doRender("calculate.htm")
 @app.route('/reset',methods=['GET','POST'])
 def reset():
@@ -138,13 +114,6 @@ def reset():
 	return doRender('calculate.htm',{'shots':shots,'minhist':minhist,'signal':signal,'pth':pth,'resrc':resrc,'restype':restype})
 @app.route('/audit',methods=['GET'])
 def audit():
-	conn=sqlite3.connect('db/audit.db')
-	cursor=conn.cursor()
-	cursor.execute("SELECT * FROM audit")
-	auditData=cursor.fetchall()
-	conn.close()
-	print(auditData)
-	auditdf=pd.DataFrame(auditData,columns=['SNo.','Resource Type','No of Resources','History','Shots','Probability','SignalType','ExecutionTime','Avergae Profit/Loss'])
 	return doRender('audit.html',{'dataframe':auditdf})
 @app.errorhandler(500)
 # A small bit of error handling

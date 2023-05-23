@@ -1,5 +1,3 @@
 runtime: python37
-entrypoint: |
-  chmod +w ./static
-  gunicorn -b :$PORT index:app
+entrypoint: gunicorn -b :$PORT index:app
 
