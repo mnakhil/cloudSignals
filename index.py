@@ -143,5 +143,12 @@ def audit():
 	print(auditData)
 	auditdf=pd.DataFrame(auditData,columns=['SNo.','Resource Type','No of Resources','History','Shots','Probability','SignalType','ExecutionTime','Avergae Profit/Loss'])
 	return doRender('audit.html',{'dataframe':auditdf})
+@app.errorhandler(500)
+# A small bit of error handling
+def server_error(e):
+    logging.exception('ERROR!')
+    return """
+    An  error occurred: <pre>{}</pre>
+    """.format(e), 500
 if __name__ == '__main__':
 	  app.run(host='127.0.0.1', port=8080, debug=True)

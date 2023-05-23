@@ -1,8 +1,15 @@
 import json
 import random
+from flask import Flask, jsonify, request
 
+app=Flask(__name__)
+
+@app.route('/cloudapi',methods=['POST'])
+def post_data():
+	data=request.get_data()
+	return ec2cloud(json.loads(data))
     
-def lambda_handler(event,context):
+def ec2cloud(data):
    
     
     # json_payload = event['body']  # Assuming the JSON payload is passed in the 'body' field
@@ -75,3 +82,6 @@ def lambda_handler(event,context):
         'var99':var_99,
         'date':date
     }
+    
+if __name__ == '__main__':
+	app.run(host='0.0.0.0', port=5000)

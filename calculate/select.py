@@ -106,7 +106,7 @@ def runInstance(resrc,shots,minhist,pth,buysell,restype):
 			if restype=="Lambda":
 				response=requests.post("https://ghxbycdfza.execute-api.us-east-1.amazonaws.com/default/testFunction",json=json_payload)
 			else:
-				response=requests.post("http://ec2-18-212-84-251.compute-1.amazonaws.com:5000/cloudapi",json=json_payload)
+				response=requests.post("http://ec2-23-21-18-160.compute-1.amazonaws.com:5000/cloudapi",json=json_payload)
 			data=response.json()
 			# print(data)
 			
